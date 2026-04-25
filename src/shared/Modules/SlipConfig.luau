@@ -1,0 +1,13 @@
+local SlipConfig = {
+	SLIP_ZONE_TAG = "NoClipZone",
+	SLIP_DELAY_SECONDS = 7,
+	TRANSPORT_BUFFER_SECONDS = 0.5,
+	CLIENT_ACTIONS = {
+		START = "START",
+		CANCEL = "CANCEL",
+		TRANSPORT = "TRANSPORT",
+		LOADED = "LOADED",
+	},
+}
+
+return SlipConfig
