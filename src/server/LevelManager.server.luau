@@ -6,10 +6,31 @@ local LevelData = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild
 local SlipConfig = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("SlipConfig"))
 
 local remoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
-local loadBackrooms = remoteEvents:WaitForChild("LoadBackrooms") :: RemoteEvent
 local slipTransportRequested = ServerScriptService:WaitForChild("SlipTransportRequested") :: BindableEvent
 
 local playerState: { [number]: string } = {}
+
+local function waitForRemoteEvent(folder: Instance, name: string): RemoteEvent
+	local existing = folder:FindFirstChild(name)
+	if existing and existing:IsA("RemoteEvent") then
+		return existing
+	end
+
+	for _, child in folder:GetChildren() do
+		if child.Name == name and child:IsA("RemoteEvent") then
+			return child
+		end
+	end
+
+	while true do
+		local child = folder.ChildAdded:Wait()
+		if child.Name == name and child:IsA("RemoteEvent") then
+			return child
+		end
+	end
+end
+
+local loadBackrooms = waitForRemoteEvent(remoteEvents, "LoadBackrooms")
 
 local function getLevel0SpawnCFrame(): CFrame
 	local level0 = LevelData.Level0

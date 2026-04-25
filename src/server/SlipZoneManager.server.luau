@@ -6,12 +6,33 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local SlipConfig = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("SlipConfig"))
 
 local remoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
-local triggerSlip = remoteEvents:WaitForChild("TriggerSlip") :: RemoteEvent
 local slipTransportRequested = ServerScriptService:WaitForChild("SlipTransportRequested") :: BindableEvent
 
 local activeSlipTokenByUserId: { [number]: number } = {}
 local touchCountByZone: { [Instance]: { [number]: number } } = {}
 local tokenCounter = 0
+
+local function waitForRemoteEvent(folder: Instance, name: string): RemoteEvent
+	local existing = folder:FindFirstChild(name)
+	if existing and existing:IsA("RemoteEvent") then
+		return existing
+	end
+
+	for _, child in folder:GetChildren() do
+		if child.Name == name and child:IsA("RemoteEvent") then
+			return child
+		end
+	end
+
+	while true do
+		local child = folder.ChildAdded:Wait()
+		if child.Name == name and child:IsA("RemoteEvent") then
+			return child
+		end
+	end
+end
+
+local triggerSlip = waitForRemoteEvent(remoteEvents, "TriggerSlip")
 
 local function getPlayerFromTouchedPart(part: BasePart): Player?
 	local character = part.Parent

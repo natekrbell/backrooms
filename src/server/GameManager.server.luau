@@ -15,8 +15,11 @@ end
 
 local function getOrCreateRemoteEvent(parent: Instance, name: string): RemoteEvent
 	local existing = parent:FindFirstChild(name)
-	if existing and existing:IsA("RemoteEvent") then
-		return existing
+	if existing then
+		if existing:IsA("RemoteEvent") then
+			return existing
+		end
+		existing.Name = string.format("%s_Legacy", name)
 	end
 
 	local remoteEvent = Instance.new("RemoteEvent")

@@ -7,8 +7,29 @@ local SlipConfig = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChil
 
 local player = Players.LocalPlayer
 local remoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
-local triggerSlip = remoteEvents:WaitForChild("TriggerSlip") :: RemoteEvent
-local loadBackrooms = remoteEvents:WaitForChild("LoadBackrooms") :: RemoteEvent
+
+local function waitForRemoteEvent(folder: Instance, name: string): RemoteEvent
+	local existing = folder:FindFirstChild(name)
+	if existing and existing:IsA("RemoteEvent") then
+		return existing
+	end
+
+	for _, child in folder:GetChildren() do
+		if child.Name == name and child:IsA("RemoteEvent") then
+			return child
+		end
+	end
+
+	while true do
+		local child = folder.ChildAdded:Wait()
+		if child.Name == name and child:IsA("RemoteEvent") then
+			return child
+		end
+	end
+end
+
+local triggerSlip = waitForRemoteEvent(remoteEvents, "TriggerSlip")
+local loadBackrooms = waitForRemoteEvent(remoteEvents, "LoadBackrooms")
 
 local playerGui = player:WaitForChild("PlayerGui")
 local slipGui = playerGui:FindFirstChild("SlipOverlay")

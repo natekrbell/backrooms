@@ -8,7 +8,13 @@
         "$path": "src/shared/Modules"
       },
       "RemoteEvents": {
-        "$path": "src/shared/RemoteEvents"
+        "$className": "Folder",
+        "TriggerSlip": {
+          "$className": "RemoteEvent"
+        },
+        "LoadBackrooms": {
+          "$className": "RemoteEvent"
+        }
       }
     },
 
