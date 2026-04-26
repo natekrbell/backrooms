@@ -74,9 +74,11 @@ local function tween(instance: Instance, duration: number, properties: { [string
 	TweenService:Create(instance, tweenInfo, properties):Play()
 end
 
-local function startSlipEffect(duration: number)
-	tween(blur, duration, { Size = 20 })
-	tween(colorCorrection, duration, { Saturation = -1, Brightness = -0.3 })
+local function startSlipEffect(_duration: number)
+	overlay.BackgroundTransparency = 0
+	blur.Size = 0
+	colorCorrection.Saturation = 0
+	colorCorrection.Brightness = 0
 end
 
 local function cancelSlipEffect()

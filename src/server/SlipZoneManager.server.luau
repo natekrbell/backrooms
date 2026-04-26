@@ -9,7 +9,6 @@ local remoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
 local slipTransportRequested = ServerScriptService:WaitForChild("SlipTransportRequested") :: BindableEvent
 
 local activeSlipTokenByUserId: { [number]: number } = {}
-local touchCountByZone: { [Instance]: { [number]: number } } = {}
 local tokenCounter = 0
 
 local function waitForRemoteEvent(folder: Instance, name: string): RemoteEvent
@@ -43,30 +42,13 @@ local function getPlayerFromTouchedPart(part: BasePart): Player?
 	return Players:GetPlayerFromCharacter(character)
 end
 
-local function cancelSlip(player: Player)
-	local userId = player.UserId
-	if not activeSlipTokenByUserId[userId] then
-		return
-	end
-
-	activeSlipTokenByUserId[userId] = nil
-	triggerSlip:FireClient(player, SlipConfig.CLIENT_ACTIONS.CANCEL)
-end
-
-local function onSlipZoneTouched(part: BasePart, slipZone: Instance)
+local function onSlipZoneTouched(part: BasePart)
 	local player = getPlayerFromTouchedPart(part)
 	if not player then
 		return
 	end
 
-	local perZone = touchCountByZone[slipZone]
-	if not perZone then
-		perZone = {}
-		touchCountByZone[slipZone] = perZone
-	end
-
 	local userId = player.UserId
-	perZone[userId] = (perZone[userId] or 0) + 1
 	if activeSlipTokenByUserId[userId] then
 		return
 	end
@@ -91,40 +73,13 @@ local function onSlipZoneTouched(part: BasePart, slipZone: Instance)
 	end)
 end
 
-local function onSlipZoneTouchEnded(part: BasePart, slipZone: Instance)
-	local player = getPlayerFromTouchedPart(part)
-	if not player then
-		return
-	end
-
-	local perZone = touchCountByZone[slipZone]
-	if not perZone then
-		return
-	end
-
-	local userId = player.UserId
-	local currentCount = perZone[userId] or 0
-	if currentCount <= 1 then
-		perZone[userId] = nil
-		cancelSlip(player)
-	else
-		perZone[userId] = currentCount - 1
-	end
-end
-
 local function registerSlipZone(slipZone: Instance)
 	if not slipZone:IsA("BasePart") then
 		return
 	end
 
-	touchCountByZone[slipZone] = touchCountByZone[slipZone] or {}
-
 	slipZone.Touched:Connect(function(part: BasePart)
-		onSlipZoneTouched(part, slipZone)
-	end)
-
-	slipZone.TouchEnded:Connect(function(part: BasePart)
-		onSlipZoneTouchEnded(part, slipZone)
+		onSlipZoneTouched(part)
 	end)
 end
 
